@@ -1,6 +1,9 @@
 package com.bignerdranch.android.geoquiz
 
 import android.app.Activity
+import android.graphics.RenderEffect
+import android.graphics.Shader
+import android.os.Build
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
@@ -8,6 +11,7 @@ import android.view.View
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
+import androidx.annotation.RequiresApi
 import com.bignerdranch.android.geoquiz.databinding.ActivityMainBinding
 
 private const val TAG = "MainActivity"
@@ -61,11 +65,18 @@ class MainActivity : AppCompatActivity() {
 
         updateQuestion()
 
+        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.S){
+            blurCheatButton()
+        }
+
+
     }
 
     private fun updateQuestion(){
         val questionTextResId = quizViewModel.currentQuestionText
         binding.questionTextView.setText(questionTextResId)
+        quizViewModel.isCheater = false
+        Log.d(TAG,quizViewModel.isCheater.toString())
     }
 
     override fun onDestroy() {
@@ -82,5 +93,15 @@ class MainActivity : AppCompatActivity() {
         }
 
         Toast.makeText(this, messageResId, Toast.LENGTH_SHORT).show()
+    }
+
+    @RequiresApi(Build.VERSION_CODES.S)
+    private fun blurCheatButton(){
+        val effect = RenderEffect.createBlurEffect(
+            10.0f,
+            10.0f,
+            Shader.TileMode.CLAMP
+        )
+        binding.cheatButton.setRenderEffect(effect)
     }
 }
